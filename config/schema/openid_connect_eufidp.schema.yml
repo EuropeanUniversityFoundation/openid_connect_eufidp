@@ -1,4 +1,4 @@
-# Schema for the configuration files of the OpenID Connect UEF IDP module.
+# Schema for the configuration files of the OpenID Connect EUF IDP module.
 openid_connect.settings.eufidp:
   type: config_object
   label: 'OpenID Connect EUF IDP settings'
