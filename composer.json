@@ -1,5 +1,5 @@
 {
-    "name": "openid_connect_eufidp",
+    "name": "euf/openid_connect_eufidp",
     "type": "drupal-module",
     "description": "OpenID Connect client for the EUF IDP",
     "keywords": [
