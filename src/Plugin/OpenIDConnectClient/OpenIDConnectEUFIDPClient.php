@@ -4,9 +4,6 @@ namespace Drupal\openid_connect_eufidp\Plugin\OpenIDConnectClient;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\openid_connect\Plugin\OpenIDConnectClientBase;
-use Exception;
-use GuzzleHttp\ClientInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
  * OpenID Connect client for the EUF IDP.
@@ -17,20 +14,6 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
  * )
  */
 class OpenIDConnectEUFIDPClient extends OpenIDConnectClientBase {
-
-  /**
-   * The HTTP client to fetch the feed data with.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
-   * The logger factory used for logging.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $loggerFactory;
 
   /**
    * {@inheritdoc}
@@ -83,30 +66,14 @@ class OpenIDConnectEUFIDPClient extends OpenIDConnectClientBase {
    * {@inheritdoc}
    */
   public function retrieveUserInfo($access_token) {
-    $request_options = [
-      'headers' => [
-        'Authorization' => 'Bearer ' . $access_token,
-        'Accept' => 'application/json',
-      ],
-    ];
-    $endpoints = $this->getEndpoints();
+    $result = parent::retrieveUserInfo($access_token);
 
-    $client = $this->httpClient;
-    try {
-      $response = $client->get($endpoints['userinfo'], $request_options);
-      $response_data = (string) $response->getBody();
+    # The module expects an array, not a boolean
+    if $result == FALSE {
+      $result = [];
+    }
 
-      return json_decode($response_data, TRUE);
-    }
-    catch (Exception $e) {
-      $variables = [
-        '@message' => 'Could not retrieve user profile information',
-        '@error_message' => $e->getMessage(),
-      ];
-      $this->loggerFactory->get('openid_connect_' . $this->pluginId)
-        ->error('@message. Details: @error_message', $variables);
-      return [];
-    }
+    return $result;
   }
 
 }
