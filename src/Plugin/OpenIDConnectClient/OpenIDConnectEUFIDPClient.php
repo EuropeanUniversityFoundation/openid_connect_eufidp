@@ -69,7 +69,7 @@ class OpenIDConnectEUFIDPClient extends OpenIDConnectClientBase {
     $result = parent::retrieveUserInfo($access_token);
 
     # The module expects an array, not a boolean
-    if $result == FALSE {
+    if ($result == FALSE) {
       $result = [];
     }
 
