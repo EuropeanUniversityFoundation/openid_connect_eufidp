@@ -2,6 +2,7 @@ name: 'OpenID Connect EUF IDP'
 type: module
 description: 'OpenID Connect client for the EUF IDP'
 core: 8.x
-package: 'Other'
+core_version_requirement: ^8.8 || ^9
+package: Security
 dependencies:
   - openid_connect:openid_connect
