@@ -1,8 +1,8 @@
-name: 'OpenID Connect EUF IDP'
+name: 'OpenID Connect EUF IdP'
 type: module
-description: 'OpenID Connect client for the EUF IDP'
-core_version_requirement: ^8.8 || ^9
-package: Security
+description: 'OpenID Connect client for the EUF IdP'
+core_version_requirement: ^9.5 || ^10
+package: 'User authentication'
 dependencies:
   - openid_connect:openid_connect
 configure: openid_connect.admin_settings

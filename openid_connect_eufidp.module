@@ -16,7 +16,7 @@ function openid_connect_eufidp_help($route_name, RouteMatchInterface $route_matc
     case 'help.page.openid_connect_eufidp':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('OpenID Connect client for the EUF IDP') . '</p>';
+      $output .= '<p>' . t('OpenID Connect client for the EUF IdP') . '</p>';
       return $output;
 
     default:

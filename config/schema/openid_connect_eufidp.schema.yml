@@ -1,26 +1,34 @@
-# Schema for the configuration files of the OpenID Connect EUF IDP module.
-openid_connect.settings.eufidp:
-  type: config_object
-  label: 'OpenID Connect EUF IDP settings'
+# Schema for the configuration files of the OpenID Connect EUF IdP module.
+openid_connect.client.plugin.eufidp:
+  type: mapping
+  label: 'OpenID Connect EUF IdP settings'
   mapping:
-    enabled:
-      type: boolean
-      label: 'Enable client'
-    settings:
-      type: mapping
-      mapping:
-        client_id:
-          type: string
-          label: 'Client ID'
-        client_secret:
-          type: string
-          label: 'Client secret'
-        authorization_endpoint:
-          type: string
-          label: 'Authorization endpoint'
-        token_endpoint:
-          type: string
-          label: 'Token endpoint'
-        userinfo_endpoint:
-          type: string
-          label: 'Userinfo endpoint'
+    client_id:
+      type: string
+      label: 'Client ID'
+    client_secret:
+      type: string
+      label: 'Client secret'
+    iss_allowed_domains:
+      type: string
+      label: 'Domains that are allowed to initiate SSO using ISS'
+    issuer_url:
+      type: string
+      label: 'Issuer URL'
+    authorization_endpoint:
+      type: string
+      label: 'Authorization endpoint'
+    token_endpoint:
+      type: string
+      label: 'Token endpoint'
+    userinfo_endpoint:
+      type: string
+      label: 'Userinfo endpoint'
+    end_session_endpoint:
+      type: string
+      label: 'End Session endpoint'
+    scopes:
+      type: sequence
+      label: 'Scopes'
+      sequence:
+        type: string

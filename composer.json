@@ -1,7 +1,7 @@
 {
     "name": "euf/openid_connect_eufidp",
     "type": "drupal-module",
-    "description": "OpenID Connect client for the EUF IDP",
+    "description": "OpenID Connect client for the EUF IdP",
     "keywords": [
     ],
     "homepage": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp",
