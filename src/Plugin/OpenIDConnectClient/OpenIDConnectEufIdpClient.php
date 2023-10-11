@@ -16,15 +16,21 @@ use Drupal\openid_connect\Plugin\OpenIDConnectClientBase;
 class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
 
   /**
+   * Base URLs for EUF IdP environments.
+   *
+   * @var array
+   */
+  protected $envUrls = [
+    'staging' => 'https://idp.dev.uni-foundation.eu',
+    'production' => 'https://idp.uni-foundation.eu',
+  ];
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration(): array {
     return [
-      'issuer_url' => '',
-      'authorization_endpoint' => 'https://example.com/oauth2/authorize',
-      'token_endpoint' => 'https://example.com/oauth2/token',
-      'userinfo_endpoint' => 'https://example.com/oauth2/userinfo',
-      'end_session_endpoint' => '',
+      'environment' => 'staging',
       'scopes' => ['openid', 'email'],
     ] + parent::defaultConfiguration();
   }
@@ -35,58 +41,15 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $form['use_well_known'] = [
-      '#title' => $this->t('Auto discover endpoints'),
-      '#type' => 'checkbox',
-      '#description' => $this->t(
-        'Requires IDP support for "<a href="@url" target="_blank">OpenID Connect Discovery</a>".',
-        ['@url' => 'https://openid.net/specs/openid-connect-discovery-1_0.html']
-      ),
-      '#default_value' => !empty($this->configuration['issuer_url']),
-    ];
+    $description = $this->t('Credentials must be defined in a settings file.');
 
-    // Auto discover fields.
-    $form['issuer_url'] = [
-      '#title' => $this->t('Issuer URL'),
-      '#type' => 'url',
-      '#default_value' => $this->configuration['issuer_url'],
-      '#states' => [
-        'visible' => [':input[name="settings[use_well_known]"]' => ['checked' => TRUE]],
-      ],
-    ];
+    $form['client_id']['#attributes']['readonly'] = 'readonly';
+    $form['client_id']['#default_value'] = 'placeholder_client_id';
+    $form['client_id']['#description'] = $description;
 
-    $form['authorization_endpoint'] = [
-      '#title' => $this->t('Authorization endpoint'),
-      '#type' => 'url',
-      '#default_value' => $this->configuration['authorization_endpoint'],
-      '#states' => [
-        'visible' => [':input[name="settings[use_well_known]"]' => ['checked' => FALSE]],
-      ],
-    ];
-    $form['token_endpoint'] = [
-      '#title' => $this->t('Token endpoint'),
-      '#type' => 'url',
-      '#default_value' => $this->configuration['token_endpoint'],
-      '#states' => [
-        'visible' => [':input[name="settings[use_well_known]"]' => ['checked' => FALSE]],
-      ],
-    ];
-    $form['userinfo_endpoint'] = [
-      '#title' => $this->t('UserInfo endpoint'),
-      '#type' => 'url',
-      '#default_value' => $this->configuration['userinfo_endpoint'],
-      '#states' => [
-        'visible' => [':input[name="settings[use_well_known]"]' => ['checked' => FALSE]],
-      ],
-    ];
-    $form['end_session_endpoint'] = [
-      '#title' => $this->t('End Session endpoint'),
-      '#type' => 'url',
-      '#default_value' => $this->configuration['end_session_endpoint'],
-      '#states' => [
-        'visible' => [':input[name="settings[use_well_known]"]' => ['checked' => FALSE]],
-      ],
-    ];
+    $form['client_secret']['#attributes']['readonly'] = 'readonly';
+    $form['client_secret']['#default_value'] = 'placeholder_client_secret';
+    $form['client_secret']['#description'] = $description;
 
     $form['scopes'] = [
       '#title' => $this->t('Scopes'),
@@ -95,22 +58,22 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
       '#default_value' => implode(' ', $this->configuration['scopes']),
     ];
 
+    $form['environment'] = [
+      '#title' => $this->t('Environment'),
+      '#type' => 'select',
+      '#options' => [
+        'staging' => $this->t('Staging'),
+        'production' => $this->t('Production'),
+      ],
+      '#default_value' => $this->configuration['environment'],
+      '#required' => TRUE,
+    ];
+
+    dpm($form);
+    dpm($this->getEndpoints());
+
+
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    parent::validateConfigurationForm($form, $form_state);
-
-    $configuration = $form_state->getValues();
-    if ($configuration['use_well_known']) {
-      $endpoints = $this->autoDiscoverEndpoints($configuration['issuer_url']);
-      if ($endpoints === FALSE) {
-        $form_state->setErrorByName('issuer_url', $this->t('The issuer URL @url appears to be invalid.', ['@url' => $configuration['issuer_url']]));
-      }
-    }
   }
 
   /**
@@ -118,20 +81,11 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $configuration = $form_state->getValues();
-    if ($configuration['use_well_known']) {
-      $endpoints = $this->autoDiscoverEndpoints($configuration['issuer_url']);
-      $this->setConfiguration([
-        'authorization_endpoint' => $endpoints['authorization_endpoint'],
-        'token_endpoint' => $endpoints['token_endpoint'],
-        'userinfo_endpoint' => $endpoints['userinfo_endpoint'],
-      ]);
-    }
-    // Don't store use_well_known in the configuration, as it is set using the
-    // value of the issuer_url setting.
-    $this->unsetConfigurationKeys(['use_well_known']);
 
     if (!empty($configuration['scopes'])) {
-      $this->setConfiguration(['scopes' => explode(' ', $configuration['scopes'])]);
+      $this->setConfiguration([
+        'scopes' => explode(' ', $configuration['scopes'])
+      ]);
     }
 
     parent::submitConfigurationForm($form, $form_state);
@@ -145,43 +99,15 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
   }
 
   /**
-   * Performs endpoint discovery.
-   *
-   * @param string $issuer_url
-   *   The issuer URL.
-   *
-   * @return array|false
-   *   Array with discovered endpoints; FALSE on failure to fetch data or the
-   *   JSON response not containing the three *required* endpoints
-   *   (authorization, token, userinfo).
-   */
-  protected function autoDiscoverEndpoints(string $issuer_url = '') {
-    static $results = [];
-
-    if (empty($issuer_url)) {
-      $issuer_url = $this->configuration['issuer_url'];
-    }
-
-    if (!isset($results[$issuer_url])) {
-      $results[$issuer_url] = $this->autoDiscover->fetch($issuer_url);
-    }
-
-    $result = $results[$issuer_url];
-    if ($result && isset($result['authorization_endpoint']) && isset($result['token_endpoint']) && isset($result['userinfo_endpoint'])) {
-      return $result;
-    }
-    return FALSE;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getEndpoints() : array {
+    $base_url = $this->envUrls[$this->configuration['environment']];
+
     return [
-      'authorization' => $this->configuration['authorization_endpoint'],
-      'token' => $this->configuration['token_endpoint'],
-      'userinfo' => $this->configuration['userinfo_endpoint'],
-      'end_session' => $this->configuration['end_session_endpoint'],
+      'authorization' => $base_url . '/oauth2/authorize',
+      'token' => $base_url . '/oauth2/token',
+      'userinfo' => $base_url . '/oauth2/userInfo',
     ];
   }
 

@@ -12,21 +12,9 @@ openid_connect.client.plugin.eufidp:
     iss_allowed_domains:
       type: string
       label: 'Domains that are allowed to initiate SSO using ISS'
-    issuer_url:
+    environment:
       type: string
-      label: 'Issuer URL'
-    authorization_endpoint:
-      type: string
-      label: 'Authorization endpoint'
-    token_endpoint:
-      type: string
-      label: 'Token endpoint'
-    userinfo_endpoint:
-      type: string
-      label: 'Userinfo endpoint'
-    end_session_endpoint:
-      type: string
-      label: 'End Session endpoint'
+      label: 'Environment'
     scopes:
       type: sequence
       label: 'Scopes'
