@@ -1,8 +1,8 @@
 # OpenID Connect EUF IDP client
 
-EUF IDP client compatible with the **8.x-1.x version** of the [OpenID Connect](https://www.drupal.org/project/openid_connect/) module.
+EUF IDP client compatible with the **3.x version** of the [OpenID Connect](https://www.drupal.org/project/openid_connect/) module.
 
-This is a pure clone of the Generic client provided by the contributed module.
+This is a clone of the _Generic OAuth 2.0_ client plugin provided by the contributed module.
 
 ## Installation
 
@@ -26,7 +26,7 @@ Finally, install the module:
 
 ## Usage
 
-A new OpenID Connect client will be available at `/admin/config/services/openid-connect`. The configuration options available are the same as the Generic client and the module ships with some defaults.
+A new OpenID Connect client option will be available at `/admin/config/people/openid-connect`. The configuration options available are the same as the _Generic OAuth 2.0_ client and the module ships with some defaults.
 
 ### Overriding defaults
 
@@ -35,6 +35,6 @@ Out of the box, the module points to the development instance of the EUF IDP. On
 **However** overriding the placeholders for Client ID and Client Secret should be done via `settings.php` or `settings.local.php` so that these credentials are not committed to the `git` repository. This approach is also useful to enable and disable certain clients per environment. See configuration override syntax below:
 
     /* EUF IDP settings */
-    #$config['openid_connect.settings.eufidp']['enabled'] = FALSE;
-    $config['openid_connect.settings.eufidp']['settings']['client_id'] = 'real_client_id';
-    $config['openid_connect.settings.eufidp']['settings']['client_secret'] = 'real_client_secret';
+    #$config['openid_connect.client.euf_idp']['status'] = FALSE;
+    $config['openid_connect.client.euf_idp']['settings']['client_id'] = 'real_client_id';
+    $config['openid_connect.client.euf_idp']['settings']['client_secret'] = 'real_client_secret';
