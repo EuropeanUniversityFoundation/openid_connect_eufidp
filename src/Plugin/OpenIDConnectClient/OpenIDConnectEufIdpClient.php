@@ -15,6 +15,9 @@ use Drupal\openid_connect\Plugin\OpenIDConnectClientBase;
  */
 class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
 
+  const PLACEHOLDER_CLIENT_ID = 'eufidp_client_id';
+  const PLACEHOLDER_CLIENT_SECRET = 'eufidp_client_secret';
+
   /**
    * Base URLs for EUF IdP environments.
    *
@@ -41,15 +44,57 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $description = $this->t('Credentials must be defined in a settings file.');
+    $requirement = $this->t('To @complete, a @step is necessary. See below.', [
+      '@complete' => $this->t('complete the client setup'),
+      '@step' => $this->t('configuration override'),
+    ]);
 
-    $form['client_id']['#attributes']['readonly'] = 'readonly';
-    $form['client_id']['#default_value'] = 'placeholder_client_id';
-    $form['client_id']['#description'] = $description;
+    $form['client_id']['#type'] = 'item';
+    $form['client_id']['#default_value'] = self::PLACEHOLDER_CLIENT_ID;
+    $form['client_id']['#description'] = $this->t('Value set to %value.', [
+      '%value' => self::PLACEHOLDER_CLIENT_ID,
+    ]) . ' ' . $requirement;
 
-    $form['client_secret']['#attributes']['readonly'] = 'readonly';
-    $form['client_secret']['#default_value'] = 'placeholder_client_secret';
-    $form['client_secret']['#description'] = $description;
+    $form['client_secret']['#type'] = 'item';
+    $form['client_secret']['#default_value'] = self::PLACEHOLDER_CLIENT_SECRET;
+    $form['client_secret']['#description'] = $this->t('Value set to %value.', [
+      '%value' => self::PLACEHOLDER_CLIENT_SECRET,
+    ]) . ' ' . $requirement;
+
+    $form['iss_allowed_domains']['#type'] = 'value';
+
+    $form['override_help'] = [
+      '#type' => 'details',
+      '#title' => $this->t('How to override this configuration'),
+      '#open' => !($this->parentEntityId),
+    ];
+
+    $markup[] = $this->t('Add the following to your %global or %local file:', [
+      '%global' => 'settings.php',
+      '%local' => 'settings.local.php',
+    ]);
+
+    $common = '$config[\'openid_connect.client.<i>machine_name</i>\']';
+    $status = $common . '[\'status\']';
+    $settings = $common . '[\'settings\']';
+    $settings_id = $settings . '[\'client_id\']';
+    $settings_secret = $settings . '[\'client_secret\']';
+
+    $markup[] = '<code>';
+    $markup[] = '/* EUF IdP settings */';
+    $markup[] = '#' . $status . ' = FALSE;';
+    $markup[] = $settings_id . ' = <b>REAL_CLIENT_ID</b>;';
+    $markup[] = $settings_secret . ' = <b>REAL_CLIENT_SECRET</b>;';
+    $markup[] = '</code>';
+
+    $markup[] = $this->t('Alternatively, use the %generic client instead.', [
+      '%generic' => $this->t('Generic OAuth 2.0'),
+    ]);
+
+    $form['override_help']['help_text'] = [
+      '#type' => 'markup',
+      '#markup' => implode('<br />', $markup),
+    ];
 
     $form['scopes'] = [
       '#title' => $this->t('Scopes'),
@@ -68,10 +113,6 @@ class OpenIDConnectEufIdpClient extends OpenIDConnectClientBase {
       '#default_value' => $this->configuration['environment'],
       '#required' => TRUE,
     ];
-
-    dpm($form);
-    dpm($this->getEndpoints());
-
 
     return $form;
   }
