@@ -26,15 +26,21 @@ Finally, install the module:
 
 ## Usage
 
-A new OpenID Connect client option will be available at `/admin/config/people/openid-connect`. The configuration options available are the same as the _Generic OAuth 2.0_ client and the module ships with some defaults.
+A new OpenID Connect client option will be available at `/admin/config/people/openid-connect`.
 
-### Overriding defaults
+The configuration options available are more limited than the _Generic OAuth 2.0_ client:
 
-Out of the box, the module points to the development instance of the EUF IdP. Once all relevant testing has been carried out, it is safe to edit the configuration to point to the production instance.
+1. _Client ID_ and _Client secret_ are hardcoded by design so that these credentials are never committed to a `git` repository along with other site configuration.
+2. Instructions on how to perform the configuration override (see below) are included in the form.
+3. There is a choice between the **Staging** and **Production** environments of the EUF IdP, whose endpoints are automatically determined by the module.
 
-**However** overriding the placeholders for Client ID and Client Secret should be done via `settings.php` or `settings.local.php` so that these credentials are not committed to the `git` repository. This approach is also useful to enable and disable certain clients per environment. See configuration override syntax below:
+### Overriding configuration
+
+Add the following to your `settings.php` or `settings.local.php` file:
 
     /* EUF IdP settings */
-    #$config['openid_connect.client.euf_idp']['status'] = FALSE;
-    $config['openid_connect.client.euf_idp']['settings']['client_id'] = 'real_client_id';
-    $config['openid_connect.client.euf_idp']['settings']['client_secret'] = 'real_client_secret';
+    #$config['openid_connect.client.machine_name']['status'] = FALSE;
+    $config['openid_connect.client.machine_name']['settings']['client_id'] = REAL_CLIENT_ID;
+    $config['openid_connect.client.machine_name']['settings']['client_secret'] = REAL_CLIENT_SECRET;
+
+Alternatively, use the _Generic OAuth 2.0_ client instead.
