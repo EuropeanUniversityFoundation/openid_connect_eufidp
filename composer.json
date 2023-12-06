@@ -1,13 +1,20 @@
 {
     "name": "euf/openid_connect_eufidp",
     "type": "drupal-module",
-    "description": "OpenID Connect client for the EUF IDP",
+    "description": "Provides an OpenID Connect client plugin for the EUF IdP.",
     "keywords": [
+        "Drupal",
+        "OpenID Connect",
+        "User management"
     ],
     "homepage": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp",
-    "minimum-stability": "dev",
-    "support": {
-        "issues": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp/issues",
-        "source": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp"
-    }
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Tiago Simões",
+            "email": "tiago.simoes@uni-foundation.eu",
+            "role": "Maintainer"
+        }
+    ],
+    "minimum-stability": "dev"
 }
