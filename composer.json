@@ -8,6 +8,10 @@
         "User management"
     ],
     "homepage": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp",
+    "support": {
+        "issues": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp/issues",
+        "source": "https://github.com/EuropeanUniversityFoundation/openid_connect_eufidp"
+    },
     "license": "GPL-2.0-or-later",
     "authors": [
         {
@@ -16,8 +20,17 @@
             "role": "Maintainer"
         }
     ],
+    "require": {
+        "drupal/openid_connect": "^1.0"
+    },
     "suggest": {
         "euf/myacademicid_user_fields": "Extends the User entity to store MyAcademicID user claims."
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ]
 }
