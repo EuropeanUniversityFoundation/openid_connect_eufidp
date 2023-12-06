@@ -16,5 +16,8 @@
             "role": "Maintainer"
         }
     ],
+    "suggest": {
+        "euf/myacademicid_user_fields": "Extends the User entity to store MyAcademicID user claims."
+    },
     "minimum-stability": "dev"
 }
