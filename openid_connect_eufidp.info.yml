@@ -1,7 +1,7 @@
 name: 'OpenID Connect EUF IdP'
 type: module
 description: 'OpenID Connect client for the EUF IdP'
-core_version_requirement: ^9.5 || ^10
+core_version_requirement: ^9.5 || ^10 || ^11
 package: 'User authentication'
 dependencies:
   - openid_connect:openid_connect
